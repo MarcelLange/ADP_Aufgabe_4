@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>ADP4 - Aufgabe 1</title>
+        <!-- morris graph lib -->
+        <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
+        <!-- LaTeX-style equations -->
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});</script>
+        <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <!-- tests -->
+        <script>
+            function assert(value, desc) {
+                var li = document.createElement("li");
+                li.style.color = value ? "blue" : "red";
+                li.appendChild(document.createTextNode(desc));
+                var list = document.getElementById("results");
+                if (!list) {
+                    list = document.createElement("div");
+                    document.body.appendChild(list);
+                }
+                list.appendChild(li);
+            }
+        </script>
+    </head>
+    <body>
+        <h1 id="title">Algorithmen und Datenstrukturen</h1>
+        <h3>Praktikum 4 - Marcel Lange, Enes Kaya</h3>
+        <hr />
+        <h2>Aufgabe 1</h2>
+        <p>
+            Gegeben sei eine Sequenz $S$ von ganzen Zahlen und eine ganze Zahl $K$. Zu berechnen ist die
+            Anzahl der Paare von Elementen $(P, Q)$ aus $S$ f&uuml;r die gilt: $P + Q = K$<br />
+            Die Implementierung soll in $O(|S| * log(|S|))$ laufen und h&ouml;chstens $O(|S|)$ zus&auml;tzlichen
+            Speicherbedarf haben.
+        </p>
+        <h3>Implementierung</h3>
+        <!-- In diesem Element wird der Inhalt des scripts mit der ID ad-4-1-results angezeigt -->
+        <pre id="ad-4-1-source"></pre>
+        <h3>Testergebnisse</h3>
+        <div id="ad-4-1-results"></div>
+        <script id="ad-4-1-code">
+            // Code
+            /**
+             * Die Funktion l&auml;uft in O(|S|*log(|S|)), da die innere Schleife bei jedem
+             * Durchlauf der &auml;u&szlig;eren Schleife ein Element weniger betrachten muss.
+             */
+            function merge(left, right) {
+                var result = [];
+                var i = 0;
+                var j = 0;
+
+                while (i < left.length && j < right.length) {
+                    if (left[i] < right[j]) {
+                        result.push(left[i++]);
+                    } else {
+                        result.push(right[j++]);
+                    }
+                    counter++;
+                }
+                // restlichen Elemente in das Objekt
+                return result.concat(left.slice(i)).concat(right.slice(j));
+            }
+
+            function mergeSort(obj) {
+                /* wenn die Länge des Objektes 0 oder 1 ist, 
+                 * dann ist es bereits sortiert und wird zurückgegeben
+                 */
+                if (obj.length < 2) { return obj; }
+                
+                var middle = Math.floor(obj.length / 2); // wir bestimmen die Mitte des Objektes und runden ab.
+                var left = obj.slice(0, middle);         // links  => ab 0 - Element vor Mitte
+                var right = obj.slice(middle);           // rechts => ab Mitte
+                return merge(mergeSort(left), mergeSort(right));
+            }
+
+            function sumpairs (S, K) {
+              
+                counter = 0;          // Zählvariable
+                var pairs = 0;        
+                S = mergeSort(S);     // sortieren der Sequenz
+                var i = 0;            // beginnt beim ersten Element
+                var j = S.length - 1; // beginnt beim letzten Element
+                while (i < j) {
+                    /* Solange der erste Zähler i kleiner als der zweite Zähler j ist 
+                     * UND Element an der Stelle i + Element an der Stelle j < als K (die gesuchte Summe)
+                     * wird i um eins erhöht.
+                     */
+                    while (i < j && S[i] + S[j] < K) {
+                        i++;
+                        counter++;
+                    }
+                    /* Solange der erste Zähler i kleiner als der zweite Zähler j ist 
+                     * UND Element an der Stelle i + Element an der Stelle j > als K (die gesuchte Summe)
+                     * wird j um eins verringert.
+                     */
+                    while (i < j && S[i] + S[j] > K) {
+                        j--;
+                        counter++;
+                    }
+                    /*
+                     * Wenn i < j UND K = Q + P, dann haben wir ein Paar
+                     */
+                    if (i < j && K === S[i] + S[j]) {
+                        pairs++;
+                        i++;
+                        j--;
+                        counter++;
+                    }
+                }
+
+                this.value = pairs;
+                this.counter = counter;
+            };
+             
+
+
+            // Tests
+            
+//            var mergeTest = [4,2,3,1];
+//            assert([1,2,3,4] === new mergeSort(mergeTest), "[1,2,3,4]");
+            
+            var sequenz = [5, 6, 8, 1, 3, 2, 5, 4, 7, 9];
+            assert(0 === new sumpairs(sequenz, 2).value, "sumpairs([5, 6, 8, 1, 3, 2, 5, 4, 7, 9], 2) == 0");
+            assert(1 === new sumpairs(sequenz, 3).value, "sumpairs([5, 6, 8, 1, 3, 2, 5, 4, 7, 9], 3) == 1");
+            assert(1 === new sumpairs(sequenz, 4).value, "sumpairs([5, 6, 8, 1, 3, 2, 5, 4, 7, 9], 4) == 1");
+            assert(2 === new sumpairs(sequenz, 5).value, "sumpairs([5, 6, 8, 1, 3, 2, 5, 4, 7, 9], 5) == 2");
+            assert(5 === new sumpairs(sequenz, 10).value, "sumpairs([5, 6, 8, 1, 3, 2, 5, 4, 7, 9], 10) == 5");
+            
+            var sequenz2 = [5];
+            assert(0 === new sumpairs(sequenz2, 2).value, "sumpairs([5], 2) == 0");
+            assert(0 === new sumpairs(sequenz2, 5).value, "sumpairs([5], 5) == 0");
+            
+            var sequenz3 = [5,5];
+            assert(1 === new sumpairs(sequenz3, 10).value, "sumpairs([5,5], 10) == 1");
+
+            assert(0 === new sumpairs([9], 9).counter, "Anzahl der Schritte => 0");
+            assert(2 === new sumpairs([9, 8], 9).counter, "Anzahl der Schritte => 2");
+            
+            
+
+            // Experiments
+            var ad_4_1_simple = [];
+            var sequenz = [5, 6, 8, 1, 3, 2, 5, 4, 7, 9];
+            for (var i = 0; i < 21; i++) {
+                ad_4_1_simple.push({experiment: i, value: new sumpairs(sequenz, i).value});
+            }
+
+            var ad_4_1_counter = [];
+            for (var i = 0; i < 100; i++) {
+                var sequenz = [];
+                for (var j = 0; j < i; j++) {
+                    sequenz[j] = j;
+                }
+                var pairs = new sumpairs(sequenz, i);
+                ad_4_1_counter.push({experiment: i, value: pairs.counter});
+            }
+        </script>
+        <!-- dieser Code zeigt die Implementierung und die Tests an -->
+        <script>$('pre#ad-4-1-source').html($('#ad-4-1-code').html())</script>
+
+        <h3>Experimente</h3>
+        <h4>Ergebnisse (Feste Sequenz)</h4>
+        <p>
+            Die Grafik zeigt f&uuml;r die Sequenz $[5, 6, 8, 1, 3, 2, 5, 4, 7, 9]$ die Anzahl der Paare an.
+            Auf der y-Achse werden die Anzahl der Paare und auf der x-Achse die Zielsumme(K) angezeigt.
+        </p>
+        <div id="ad-4-1-simple" style="height: 250px;"></div>
+        <h4>Laufzeiten</h4>
+        <p>
+            An diesem Graph kann man erkennen, dass die Laufzeit $O(|S|*log(|S|)+|S|)$ ist.
+            Die x-Achse ist die Anzahl der Schritte, die ben&ouml;tigt werden um eine Sequenz der ansteigenden Gr&ouml;sse zu bearbeiten.
+            
+        </p>
+        <div id="ad-4-1-counter" style="height: 250px;"></div>
+        <script>
+            new Morris.Line({
+                element: 'ad-4-1-simple', // ID of the element in which to draw the chart.
+                parseTime: false, // do values relate to dates (time)?
+                data: ad_4_1_simple, // Chart data records -- each entry in this array corresponds to a point on the chart.
+                xkey: 'experiment', // The name of the data record attribute that contains x-values.
+                ykeys: ['value'], // A list of names of data record attributes that contain y-values.
+                labels: ['Paare'] // Labels for the ykeys -- will be displayed when you hover over the chart.
+            });
+            new Morris.Line({
+                element: 'ad-4-1-counter', // ID of the element in which to draw the chart.
+                parseTime: false, // do values relate to dates (time)?
+                data: ad_4_1_counter, // Chart data records -- each entry in this array corresponds to a point on the chart.
+                xkey: 'experiment', // The name of the data record attribute that contains x-values.
+                ykeys: ['value'], // A list of names of data record attributes that contain y-values.
+                labels: ['Counter'] // Labels for the ykeys -- will be displayed when you hover over the chart.
+            });
+        </script>
+        <hr />
+        <div>
+            <p>
+                <a href="index.html">Zur&uuml;ck</a> | 
+                Aufgabe 1 |
+                <a href="Aufgabe 2.html">Aufgabe 2</a> |
+                <a href="Aufgabe 3.html">Aufgabe 3</a> |
+                <a href="Aufgabe 4.html">Aufgabe 4</a>
+            </p>
+        </div>
+    </body>
+</html>
