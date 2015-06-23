@@ -46,8 +46,8 @@
             // Code
             function mittelpunkt(sequenz) {
                 var counter = 0;
-                var index = -1;
-                var sum = 0;
+                var index = -1;             // -1 default Returnwert, wenn es keinen Mittelpunkt gibt
+                var sum = 0;                
                 for (var i = 0; i < sequenz.length; i++) {
                     sum = sum + sequenz[i]; // Aufsummieren der Elemente in sequenz
                     counter++;
@@ -56,10 +56,14 @@
                 var subSum = 0;
                 for (i = 0; i < sequenz.length; i++) {
                     counter++;
+                    /*
+                     * Wenn die Teilsumme gleich die Haelfte der Gesammtsumme ist,  
+                     * dann ist der index an stelle i
+                     */
                     if (subSum === sum / 2) {
                         index = i;
                     }
-                    subSum = subSum + sequenz[i];
+                    subSum = subSum + sequenz[i]; // Teilsumme erhoehen
                 }
                 this.value = index;
                 this.counter = counter;

@@ -97,11 +97,11 @@
                  * F&uuml;gt den Knoten mit angegebenen Wert in den Baum ein.
                  */
                 this.add = function (value) {
-                    var node = new Node(value);
-                    if (this.root === null) {
-                        this.root = node;
+                    var node = new Node(value);     // Erstellen eines Node Objektes
+                    if (this.root === null) {       // Wenn es noch keinen Wurzelknoten gibt, wird der neue Knoten zum Wurzelknoten
+                        this.root = node;       
                     } else {
-                        this.root.addChild(node);
+                        this.root.addChild(node);   // Sonst wird der neue Knoten zum Kindknoten
                     }
                 };
 
@@ -117,24 +117,40 @@
 
                 this.findLongestPath_rec = function (node, length, direction) {
 
+                    /*
+                     * Wenn die Richtung bereits links war, dann wird lengthLeft erhoeht.
+                     * Wenn nicht, dann wird lengthLeft auf 1 gesetzt
+                     */
                     var lengthLeft;
                     if (direction === "left")
                         lengthLeft = length + 1;
                     else
                         lengthLeft = 1;
-
+                    
+                    /*
+                     * Wenn die Richtung bereits rechts war, dann wird lengthRight erhoeht.
+                     * Wenn nicht, dann wird lengthRight auf 1 gesetzt
+                     */
                     var lengthRight;
                     if (direction === "right")
                         lengthRight = length + 1;
                     else
                         lengthRight = 1;
-
+                    
+                    /*
+                     * Wenn links ein Knoten existiert, dann wird der maximale linke Pfad ermittelt
+                     * Wenn nicht, dann 0
+                     */
                     var maxLeft;
                     if (node.left !== null)
                         maxLeft = this.findLongestPath_rec(node.left, lengthLeft, "left");
                     else
                         maxLeft = 0;
-
+                    
+                    /*
+                     * Wenn rechts ein Knoten existiert, dann wird der maximale rechte Pfad ermittelt
+                     * Wenn nicht, dann 0
+                     */
                     var maxRight;
                     if (node.right !== null)
                         maxRight = this.findLongestPath_rec(node.right, lengthRight, "right");
@@ -142,7 +158,8 @@
                         maxRight = 0;
 
                     this.counterPlace = this.counterPlace + 4;
-
+                    
+                    // hier wird der laengste Pfad ermittelt
                     if (maxLeft > maxRight) {
                         if (maxLeft > length) {
                             length = maxLeft;
